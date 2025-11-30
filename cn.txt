@@ -1,0 +1,160 @@
+package cn;
+import java.io.*;
+import java.net.*;
+
+
+public class EchoServer {
+    public static void main(String[] args) throws Exception {
+        ServerSocket socket = new ServerSocket(8000);
+        System.out.println("Server started");
+        Socket socket2 = socket.accept();
+        System.out.println("Client started");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
+        PrintWriter out = new PrintWriter(socket2.getOutputStream(),true);
+
+        String msg = in.readLine();
+        out.println(msg);
+        socket2.close();
+
+        socket.close();
+    }
+    
+}
+package cn;
+import java.io.*;
+import java.net.*;
+
+public class Echoclient {
+    public static void main(String[] args) throws Exception {
+        Socket socket = new Socket("localhost",8000);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+
+        out.println("hi fucking shit");
+        System.out.println(in.readLine());
+        socket.close();
+    }
+    
+}
+
+
+
+//3
+
+#include <stdio.h>
+#include <string.h>
+
+#define FLAG "01111110"
+
+void stuff(char *in, char *out)
+{
+    int c = 0;
+    for(int i=0,j=0; in[i]; i++){
+        out[j++] = in[i];
+        if(in[i]=='1'){
+            c++;
+            if(c==5){ out[j++]='0'; c=0; }
+        } else c=0;
+    }
+}
+
+/* Bit de-stuffing */
+void destuff(char *in, char *out)
+{
+    int c = 0;
+    for(int i=0,j=0; in[i]; i++){
+        out[j++] = in[i];
+        if(in[i]=='1'){
+            c++;
+            if(c==5){ i++; c=0; }
+        } else c=0;
+    }
+}
+
+int main()
+{
+    FILE *f;
+    char data[200], stuffed[300], final[200], frame[400];
+
+    /* SENDER */
+    f = fopen("input.txt","r");
+    fgets(data,200,f);
+    fclose(f);
+
+    stuff(data, stuffed);
+    sprintf(frame,"%s%s%s", FLAG, stuffed, FLAG);
+
+    printf("Frame Sent: %s\n", frame);
+
+    /* RECEIVER */
+    strncpy(stuffed, frame+8, strlen(frame)-16);
+    stuffed[strlen(frame)-16] = '\0';
+
+    destuff(stuffed, final);
+
+    f = fopen("output.txt","w");
+    fputs(final, f);
+    fclose(f);
+
+    printf("Recovered: %s\n", final);
+
+    return 0;
+}
+//4
+
+#include <stdio.h>
+#include <string.h>
+
+#define FLAG "01111110"
+
+void stuff(char *in, char *out)
+{
+    int c=0, j=0;
+    for(int i=0; in[i]; i++){
+        out[j++] = in[i];
+        if(in[i]=='1'){
+            c++;
+            if(c==5){ out[j++]='0'; c=0; }
+        } else c=0;
+    }
+    out[j]='\0';
+}
+
+void destuff(char *in, char *out)
+{
+    int c=0, j=0;
+    for(int i=0; in[i]; i++){
+        out[j++] = in[i];
+        if(in[i]=='1'){
+            c++;
+            if(c==5){ i++; c=0; }
+        } else c=0;
+    }
+    out[j]='\0';
+}
+
+int main()
+{
+    char data[200], stuffed[300], final[200], frame[400];
+
+    printf("Enter payload bits: ");
+    scanf("%s", data);
+
+    /* SENDER */
+    stuff(data, stuffed);
+    sprintf(frame, "%s%s%s", FLAG, stuffed, FLAG);
+
+    printf("\nFrame Sent : %s", frame);
+
+    /* RECEIVER (remove flags) */
+    strncpy(stuffed, frame+8, strlen(frame)-16);
+    stuffed[strlen(frame)-16] = '\0';
+
+    destuff(stuffed, final);
+
+    printf("\nRecovered Data : %s\n", final);
+
+    return 0;
+}
