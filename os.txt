@@ -41,7 +41,7 @@ cat "$dest"
 lines=$(wc -l < "$dest")
 words=$(wc -w < "$dest")
 chars=$(wc -c < "$dest")
-newlines=$lines
+newlines=$(grep -o '\\n' "$dest")
 
 echo "File name: $dest" > Third_File.txt
 echo "Lines: $lines" >> Third_File.txt
