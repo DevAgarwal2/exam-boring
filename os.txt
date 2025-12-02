@@ -274,6 +274,63 @@ int main() {
 
     return 0;
 }
+//8 in python
+
+n = int(input("Enter number of processes: "))
+
+p = []
+
+for i in range(n):
+    pid, at, bt = map(int, input("PID Arrival Burst: ").split())
+    p.append({
+        "pid": pid,
+        "at": at,
+        "bt": bt,
+        "wt": 0,
+        "tat": 0,
+        "done": False
+    })
+
+# ---------------- FCFS ----------------
+print("\nFCFS Scheduling:")
+time = 0
+
+for i in range(n):
+    if time < p[i]["at"]:
+        time = p[i]["at"]
+
+    p[i]["wt"] = time - p[i]["at"]
+    p[i]["tat"] = p[i]["wt"] + p[i]["bt"]
+    time += p[i]["bt"]
+
+    print(f"P{p[i]['pid']} WT={p[i]['wt']} TAT={p[i]['tat']}")
+
+# ---------------- SPN ----------------
+print("\nSPN Scheduling:")
+time = 0
+completed = 0
+
+while completed < n:
+    min_bt = 9999
+    index = -1
+
+    for i in range(n):
+        if p[i]["at"] <= time and not p[i]["done"] and p[i]["bt"] < min_bt:
+            min_bt = p[i]["bt"]
+            index = i
+
+    if index == -1:
+        time += 1
+        continue
+
+    p[index]["wt"] = time - p[index]["at"]
+    time += p[index]["bt"]
+    p[index]["tat"] = p[index]["wt"] + p[index]["bt"]
+    p[index]["done"] = True
+    completed += 1
+
+    print(f"P{p[index]['pid']} WT={p[index]['wt']} TAT={p[index]['tat']}")
+
 //9
 #include <stdio.h>
 
