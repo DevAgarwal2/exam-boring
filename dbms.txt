@@ -1,0 +1,734 @@
+//1
+Practical 1: Setup (Create & Insert)
+SQL
+
+-- Create Tables
+CREATE TABLE salespeople(
+    snum NUMBER(4) PRIMARY KEY,
+    sname VARCHAR2(20),
+    city VARCHAR2(15),
+    comm NUMBER(5,2)
+);
+
+CREATE TABLE customer(
+    cnum NUMBER(4) PRIMARY KEY,
+    cname VARCHAR2(20),
+    city VARCHAR2(15),
+    rating NUMBER(4),
+    snum NUMBER(4) REFERENCES salespeople
+);
+
+CREATE TABLE orders(
+    onum NUMBER(4) PRIMARY KEY,
+    amt NUMBER(6,2),
+    odate DATE,
+    cnum NUMBER(4) REFERENCES customer,
+    snum NUMBER(4) REFERENCES salespeople
+);
+
+-- Insert Data: Salespeople
+INSERT INTO salespeople VALUES(101, 'Devendra Vashi', 'Kosamba', 25.52);
+INSERT INTO salespeople VALUES(102, 'Yogini Vashi', 'Boridara', 12.21); 
+-- Note: Logs showed 'Boridatr' in one instance, corrected to 'Boridara' based on first entry, 
+-- or you can use 'Boridatr' if you wish to match the specific log typo.
+
+-- Insert Data: Customer
+INSERT INTO customer VALUES(201, 'Aladin', 'Goa', 1, 101);
+INSERT INTO customer VALUES(202, 'Malaram', 'Surat', 1, 101);
+
+-- Insert Data: Orders
+INSERT INTO orders VALUES(301, 100, '01-jan-2006', 201, 101);
+INSERT INTO orders VALUES(302, 120, '15-feb-2010', 202, 102);
+
+-- Commit changes
+COMMIT;
+Practical 1: Queries
+SQL
+
+-- 1. Produce salespeople columns in specific order
+SELECT city, sname, snum, comm FROM salespeople;
+
+-- 2. Select all from salespeople
+SELECT * FROM salespeople;
+
+-- 3. Select all from customer
+SELECT * FROM customer;
+
+-- 4. Select all from orders
+SELECT * FROM orders;
+
+-- 5. Order number, amount and date for all rows
+SELECT onum, amt, odate FROM orders;
+
+-- 6. All customers where salesperson number is 101
+SELECT * FROM customer WHERE snum = 101;
+
+-- 7. Display only salesman number from orders
+SELECT snum FROM orders;
+
+-- 8. All orders for more than Rs. 100
+SELECT * FROM orders WHERE amt >= 100;
+
+-- 9. Salespeople located in Kosamba with commission > 10% (and Belgaum check)
+SELECT sname, city FROM salespeople WHERE city = 'Kosamba' AND comm >= 10;
+SELECT sname, city FROM salespeople WHERE city = 'Belgaum' AND comm >= 10;
+
+-- 10. Exclude customers with rating <> 1 and not located in Ahmedabad
+SELECT * FROM customer WHERE rating > 1 AND city <> 'Ahmedabad';
+
+-- 11. Orders taken on specific dates
+SELECT * FROM orders WHERE odate = '14-feb-2004' OR odate = '15-feb-2005';
+
+-- 12. Join customer and salespeople
+SELECT cname, sname FROM customer c, salespeople s WHERE c.snum = s.snum;
+
+-- 13. Join with specific salesperson names
+SELECT cname, sname FROM customer c, salespeople s 
+WHERE c.snum = s.snum AND sname IN ('Devendra Vashi', 'Yogini Vashi');
+
+-- 14. Customers names beginning with A or B
+SELECT * FROM customer WHERE cname LIKE 'A%' OR cname LIKE 'B%';
+
+-- 15. Customers names beginning with A through G
+SELECT * FROM customer 
+WHERE cname LIKE 'A%' OR cname LIKE 'B%' OR cname LIKE 'C%' 
+OR cname LIKE 'D%' OR cname LIKE 'E%' OR cname LIKE 'F%' OR cname LIKE 'G%';
+
+-- Describe tables
+DESC salespeople;
+DESC customer;
+DESC orders;
+Practical 2: Queries
+Although you requested Practical 1, your text included Practical 2. Here are those extracted queries.
+
+WHERE Clauses
+
+SQL
+
+-- 1. City is Ahmedabad
+SELECT * FROM salespeople WHERE city = 'Ahmedabad';
+
+-- 2. City is NOT Ahmedabad
+SELECT * FROM salespeople WHERE NOT city = 'Ahmedabad';
+
+-- 3. Comm is 11.11
+SELECT * FROM salespeople WHERE comm = 11.11;
+
+-- 4. City is Ahmedabad AND Comm is 25.52 (and 88.99 check)
+SELECT * FROM salespeople WHERE city = 'Ahmedabad' AND comm = 25.52;
+SELECT * FROM salespeople WHERE city = 'Ahmedabad' AND comm = 88.99;
+
+-- 5. City is Ahmedabad OR Kosamba
+SELECT * FROM salespeople WHERE city = 'Ahmedabad' OR city = 'Kosamba';
+ORDER BY
+
+SQL
+
+-- 1. Sort by City alphabetically
+SELECT * FROM salespeople ORDER BY city;
+
+-- 2. Sort by City reversed
+SELECT * FROM salespeople ORDER BY city DESC;
+
+-- 3. Sort by City then Comm
+SELECT * FROM salespeople ORDER BY city, comm;
+NULL Handling
+
+SQL
+
+-- 1. City is NULL
+SELECT * FROM salespeople WHERE city IS NULL;
+
+-- 2. City is NOT NULL
+SELECT * FROM salespeople WHERE city IS NOT NULL;
+UPDATE
+
+SQL
+
+-- 1. Update all cities (Example from log set to Oslo)
+UPDATE salespeople SET city = 'Oslo';
+
+-- 2. Set City to Surat where Comm is 88.99
+UPDATE salespeople SET city = 'Surat' WHERE comm = 88.99;
+
+-- 3. Update Name and City for specific ID
+UPDATE salespeople SET sname = 'Devendra', city = 'Ahmedabad' WHERE snum = 101;
+DELETE
+
+SQL
+
+-- 1. Delete order 305
+DELETE FROM orders WHERE onum = 305;
+
+-- 2. Delete all orders
+DELETE FROM orders;
+
+//3
+3 Write and Perform the SQL queries for the following:
+1. From the following table, create a view for those salespeople who belong to the city
+of New York. 
+CREATE or REPLACE VIEW sp
+AS SELECT * FROM salespeople WHERE city = &#39;Surat&#39;;
+table: salespeople
+select * from sp;
+2. From the following table, create a view for all salespeople. Return salesperson ID,
+name, and city.  
+CREATE or REPLACE VIEW view_sp1 AS SELECT snum, sname, city FROM salespeople;
+table: salespeople
+select * from view_sp1;
+3. From the following table, create a view to locate the salespeople in the city &#39;New
+York&#39;.
+CREATE VIEW view_sp2 AS SELECT snum, sname, city FROM salespeople WHERE city = &#39;New
+York&#39;;
+table: salespeople
+select * from view_sp2;
+4. From the following table, create a view that counts the number of customers in
+each city.  
+CREATE VIEW view_sp3 AS SELECT city, COUNT(*) AS cnum FROM customer GROUP BY city;
+table: customer
+select * from view_sp3;
+5. From the following table, create a view to count the number of unique customers,
+compute the average and the total purchase amount of customer orders by each date.
+CREATE VIEW view_sp4 AS SELECT odate, COUNT(DISTINCT cnum) AS unique_customers,
+AVG(amt) AS avg_purchase_amount, SUM(amt) AS total_purchase_amount FROM orders
+GROUP BY odate;
+table : orders
+select * from view_sp4;
+6. From the following tables, create a view to get the salesperson and customer by
+name. Return order name, purchase amount, salesperson ID, name, customer name.
+CREATE VIEW view_sp5 AS SELECT o.onum, o.amt, s.snum, s.sname AS salesperson_name,
+c.cname AS customer_name FROM orders o JOIN salespeople s ON o.snum = s.snum JOIN
+customer c ON o.cnum = c.cnum;
+table: salespeople, customer, orders
+select * from view_sp5;
+7. From the following table, create a view to find the salesperson who handles a
+customer who makes the highest order of the day. Return order date, salesperson ID,
+name.
+CREATE VIEW sp7 AS
+SELECT
+o.odate,
+
+1 10 4
+
+s.snum,
+s.sname
+FROM
+orders o
+JOIN
+salespeople s ON o.snum = s.snum
+WHERE
+o.amt = (
+SELECT MAX(o2.amt)
+FROM orders o2
+WHERE o2.odate = o.odate
+);
+table: salespeople, orders
+select * from sp7;
+8. From the following table, create a view to find the salesperson who deals with the
+customer with the highest order at least three times per day. Return salesperson ID
+and name.
+CREATE VIEW sp8 AS
+SELECT
+s.snum,
+s.sname
+FROM
+salespeople s
+JOIN
+orders o ON s.snum = o.snum
+JOIN
+customer c ON o.cnum = c.cnum
+WHERE
+o.amt = (
+SELECT MAX(o2.amt)
+FROM orders o2
+WHERE o2.odate = o.odate
+)
+GROUP BY
+s.snum, s.sname
+HAVING
+COUNT(o.onum) &gt;= 3;
+table: customer, salespeople, orders
+select * from sp8;
+9. From the following table, create a view to find all the customers who have the
+highest grade. Return all the fields of customer.
+CREATE VIEW sp9 AS
+SELECT *
+FROM customer
+WHERE grade = (SELECT MAX(rating) FROM customer);
+table: customer
+select * from sp9;
+10. From the following table, create a view to count the number of salespeople in
+each city. Return city, number of salespersons.
+CREATE VIEW salespeople_count_by_city AS
+SELECT city, COUNT(*) AS number_of_salespersons
+FROM salespeople
+GROUP BY city;
+table: salespeople
+
+select * from salespeople_count_by_city;
+11. From the following table, create a view to compute the average purchase amount
+and total purchase amount for each salesperson. Return name, average purchase
+and total purchase amount. (Assume all names are unique.).
+CREATE VIEW salesperson_purchase_summary AS
+SELECT s.sname,
+AVG(o.amt) AS average_purchase_amount,
+SUM(o.amt) AS total_purchase_amount
+FROM salespeople s
+JOIN orders o ON s.snum = o.snum
+GROUP BY s.sname;
+Sample table: salespeople, orders
+select * from salesperson_purchase_summary;
+12. From the following table, create a view to identify salespeople who work with
+multiple clients. Return all the fields of salesperson.
+CREATE VIEW Salespeople_Multiple_Clients AS
+SELECT s.snum, s.sname
+FROM salespeople s JOIN customer c ON s.snum = c.snum GROUP BY s.snum, s.sname, s.city
+HAVING COUNT(DISTINCT c.cnum) &gt; 1;
+Sample table: salespeople, customer
+select * from Salespeople_Multiple_Clients;
+13. From the following table, create a view that shows all matching customers with
+salespeople, ensuring that at least one customer in the city of the customer is served
+by the salesperson in the city of the salesperson.
+CREATE VIEW sp13 AS
+SELECT c.cnum, s.snum
+FROM salespeople s
+JOIN customer c ON s.snum = c.snum
+WHERE s.city = c.city;
+Sample table: salespeople, customer
+Select * from sp13;
+14. From the following table, create a view to display the number of orders per day.
+Return order date and number of orders.
+CREATE VIEW Orders_Per_Day AS
+SELECT odate, COUNT(onum) AS number_of_orders
+FROM orders
+GROUP BY odate;
+Sample table: orders
+Select * from Orders_Per_Day;
+15. From the following table, create a view to find the salespeople who placed orders
+on 24-Jan-23. Return all the fields of salesperson.
+CREATE or replace VIEW Salespeople_Orders AS
+SELECT s.snum, s.sname
+FROM salespeople s
+JOIN orders o ON s.snum = o.snum
+WHERE o.odate = ‘24-Jan-23’;
+Sample table: salespeople, orders
+Select * from Salespeople_Orders;
+16. From the following table, create a view to find the salespersons who issued orders
+on either August 17th, 2012 or October 10th, 2012. Return salesperson ID, order
+number and customer ID.
+CREATE VIEW sp16 AS
+SELECT snum, onum, cnum
+FROM orders
+
+WHERE odate IN (TO_DATE(&#39;2012-08-17&#39;, &#39;YYYY-MM-DD&#39;), TO_DATE(&#39;2012-10-10&#39;,
+&#39;YYYY-MM-DD&#39;));
+Sample table: orders
+select * from sp16;
+
+
+//4
+Here are the extracted and cleaned SQL queries from the text provided, organized by category (Arithmetic, Aggregates, and Grouping).
+
+Part 1: Arithmetic & Column Calculations
+SQL
+
+-- 1. Simple arithmetic using DUAL table
+SELECT 15+10 FROM dual;
+
+-- 2. Calculate 10% of order amount (Projection)
+SELECT cname, rating, orders.amt * 0.10 
+FROM customer, orders 
+WHERE orders.cnum = customer.cnum;
+
+-- 3. Subtract 0.10 from order amount
+SELECT cname, rating, orders.amt - 0.10 
+FROM customer, orders 
+WHERE orders.cnum = customer.cnum;
+Part 2: Aggregate Functions (Count, Sum, Avg, Max, Min)
+SQL
+
+-- 1. Find the total purchase amount of all orders
+SELECT SUM(amt) FROM orders;
+
+-- 2. Find the average purchase amount of all orders
+SELECT AVG(amt) FROM orders;
+
+-- 3. Find the number of salespeople currently listed in orders
+SELECT COUNT(DISTINCT snum) FROM orders;
+
+-- 4. Count how many customers have listed their names
+SELECT COUNT(*) FROM customer;
+
+-- 5. Find the number of customers who have a rating (not null)
+SELECT COUNT(rating) FROM customer;
+-- OR explicitly as shown in log:
+SELECT COUNT(ALL rating) FROM customer;
+
+-- 6. Find the maximum and minimum purchase amount of all orders
+SELECT MAX(amt) AS max_purchase_amount, MIN(amt) AS min_purchase_amount FROM orders;
+
+-- 6b. (Individual queries from log)
+SELECT MAX(amt) FROM orders;
+SELECT MIN(amt) FROM orders;
+Part 3: Grouping (GROUP BY & HAVING)
+SQL
+
+-- 7. Select the highest rating for each city
+SELECT city, MAX(rating) 
+FROM customer 
+GROUP BY city;
+
+-- 8. Find the highest purchase amount ordered by each customer ID
+SELECT cnum, MAX(amt) 
+FROM orders 
+GROUP BY cnum;
+
+-- 9. Find the highest purchase amount ordered by each customer on a particular date
+-- (Note: Corrected 'date' to 'odate' based on table structure)
+SELECT cnum, odate, MAX(amt) 
+FROM orders 
+GROUP BY cnum, odate;
+
+-- 10. Find the highest purchase amount on '01-JAN-06' for each salesman
+SELECT snum, MAX(amt) 
+FROM orders 
+WHERE odate = '01-JAN-06' 
+GROUP BY snum;
+
+-- 11. Find customers/dates where the highest purchase amount is more than 100
+-- (Demonstrates HAVING clause)
+SELECT cnum, odate, MAX(amt) 
+FROM orders 
+GROUP BY cnum, odate 
+HAVING MAX(amt) > 100;
+
+//5
+
+
+set serveroutput on;
+DECLARE
+-- Define the procedure to find the minimum of two values
+PROCEDURE find_minimum(num1 IN NUMBER, num2 IN
+NUMBER, min_val OUT NUMBER) IS
+BEGIN
+-- Use a simple conditional to assign the minimum value
+IF num1 &lt; num2 THEN
+min_val := num1;
+ELSE
+min_val := num2;
+END IF;
+END find_minimum;
+
+-- Declare variables to hold input values and the result
+num1 NUMBER := 15;
+num2 NUMBER := 25;
+min_val NUMBER;
+BEGIN
+-- Call the procedure
+find_minimum(num1, num2, min_val);
+-- Display the result
+DBMS_OUTPUT.PUT_LINE(&#39;The minimum value is: &#39; || min_val);
+END;
+/
+ The IN mode is used for input parameters.
+ The OUT mode is used for output parameters. These parameters are
+used to return values back to the calling environment.
+DECLARE
+-- Define the procedure to calculate area and perimeter of a rectangle
+PROCEDURE calculate_rectangle(length IN NUMBER, width IN
+NUMBER, area OUT NUMBER, perimeter OUT NUMBER) IS
+BEGIN
+-- Calculate the area
+area := length * width;
+-- Calculate the perimeter
+
+perimeter := 2 * (length + width);
+END calculate_rectangle;
+-- Declare variables to hold input values and results
+length NUMBER := 10;
+width NUMBER := 5;
+area NUMBER;
+perimeter NUMBER;
+BEGIN
+-- Call the procedure
+calculate_rectangle(length, width, area, perimeter);
+-- Display the results
+DBMS_OUTPUT.PUT_LINE(&#39;Area of the rectangle: &#39; || area);
+DBMS_OUTPUT.PUT_LINE(&#39;Perimeter of the rectangle: &#39; || perimeter);
+END;
+/
+
+//6
+  Write a PL SQL program that demonstrates Declaring, Defining, and Invoking a Simple
+PL/SQL Function that computes and returns the maximum of two values.
+-- Declare the function
+CREATE OR REPLACE FUNCTION get_max(a NUMBER, b NUMBER) RETURN
+NUMBER IS
+max_num NUMBER;
+BEGIN
+-- Determine the maximum value
+IF a &gt; b THEN
+max_num := a;
+ELSE
+max_num := b;
+END IF;
+-- Return the maximum value
+RETURN max_num;
+END;
+/
+-- Example of invoking the function
+DECLARE
+num1 NUMBER := 20;
+num2 NUMBER := 35;
+result NUMBER;
+BEGIN
+-- Call the function and store the result in the &quot;result&quot; variable
+result := get_max(num1, num2);
+-- Display the result
+DBMS_OUTPUT.PUT_LINE(&#39;The maximum value between &#39; || num1 || &#39; and &#39; || num2 || &#39;
+is: &#39; || result);
+END;
+/
+(B). Write a PL SQL program which calculates the factorial of a given number by calling itself
+recursively.
+DECLARE
+num number;
+factorial number;
+FUNCTION fact(x number)
+RETURN number
+IS
+f number;
+BEGIN
+IF x=0 THEN
+f := 1;
+ELSE
+f := x * fact(x-1);
+
+4 10 4
+
+END IF;
+RETURN f;
+END;
+
+BEGIN
+num:= 6;
+factorial := fact(num);
+dbms_output.put_line(&#39; Factorial &#39;|| num || &#39; is &#39; || factorial);
+END;
+/
+
+//7
+
+No.
+
+Title CO Marks Hours
+
+7 Write a code in PL/SQL TO create a trigger that automatically updates a &#39;last_modified&#39;
+timestamp whenever a row in a specific table is updated.
+-- Create the &#39;employee&#39; table
+CREATE TABLE employee (
+employee_id NUMBER PRIMARY KEY,
+first_nameVARCHAR2(50),
+last_nameVARCHAR2(50),
+last_modified TIMESTAMP
+);
+
+-- Create a trigger to update the &#39;last_modified&#39; timestamp
+CREATE OR REPLACE TRIGGER update_last_modified
+BEFORE UPDATE ON employee
+FOR EACH ROW
+BEGIN
+:NEW.last_modified := SYSTIMESTAMP;
+END;
+/
+-- Insert a sample record
+INSERT INTO employee (employee_id, first_name, last_name) VALUES (1, &#39;Dior&#39;, &#39;Reese&#39;);
+
+-- Verify the initial timestamp
+SELECT * FROM employee;
+
+-- Update the record
+UPDATE employee SET first_name = &#39;Jane&#39; WHERE employee_id = 1;
+
+4 10 4
+
+-- Verify the updated timestamp
+SELECT * FROM employee;
+
+
+//8
+
+DECLARE
+-- Define a table-based record for the EMPLOYEES table
+emp_record EMPLOYEES%ROWTYPE;
+
+BEGIN
+-- Assign values to the record fields
+emp_record.EMP_ID := 101;
+emp_record.EMP_NAME := &#39;John Doe&#39;;
+emp_record.DEPT_ID := 10;
+emp_record.SALARY := 75000;
+
+-- Insert the record into the EMPLOYEES table
+INSERT INTO EMPLOYEES VALUES emp_record;
+
+-- Display the inserted record
+DBMS_OUTPUT.PUT_LINE(&#39;Record Inserted:&#39;);
+DBMS_OUTPUT.PUT_LINE(&#39;ID: &#39; || emp_record.EMP_ID);
+DBMS_OUTPUT.PUT_LINE(&#39;Name: &#39; || emp_record.EMP_NAME);
+DBMS_OUTPUT.PUT_LINE(&#39;Department ID: &#39; || emp_record.DEPT_ID);
+DBMS_OUTPUT.PUT_LINE(&#39;Salary: &#39; || emp_record.SALARY);
+
+EXCEPTION
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE(&#39;Error: &#39; || SQLERRM);
+END;
+/
+DECLARE
+-- Declare a cursor to fetch data from the EMPLOYEES table
+
+CURSOR emp_cursor IS
+SELECT EMP_ID, EMP_NAME, DEPT_ID, SALARY
+FROM EMPLOYEES;
+
+-- Declare a cursor-based record
+emp_record emp_cursor%ROWTYPE;
+
+BEGIN
+-- Open the cursor and fetch each record
+OPEN emp_cursor;
+LOOP
+FETCH emp_cursor INTO emp_record;
+
+-- Exit the loop when no more rows are found
+EXIT WHEN emp_cursor%NOTFOUND;
+
+-- Process and display the current record
+DBMS_OUTPUT.PUT_LINE(&#39;Employee ID: &#39; || emp_record.EMP_ID);
+DBMS_OUTPUT.PUT_LINE(&#39;Name: &#39; || emp_record.EMP_NAME);
+DBMS_OUTPUT.PUT_LINE(&#39;Department ID: &#39; || emp_record.DEPT_ID);
+DBMS_OUTPUT.PUT_LINE(&#39;Salary: &#39; || emp_record.SALARY);
+DBMS_OUTPUT.PUT_LINE(&#39;----------------------------&#39;);
+END LOOP;
+
+-- Close the cursor
+CLOSE emp_cursor;
+
+EXCEPTION
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE(&#39;Error: &#39; || SQLERRM);
+END;
+
+/
+
+
+//9
+
+  Perform the DCL commands (grant, revoke):
+Create a student table with the following fields: StudentCode, Name, Dateofbirth, Course,
+RollNo, Batch, Result.
+Create table student_grant(
+StudentCode number(4),
+Name varchar2(8),
+Dateofbirth date,
+Course varchar2(8),
+RollNo varchar2(8),
+Batch varchar2(8),
+Result varchar2(8));
+
+Grant and Revoke the following security constraints:
+1. User Falgun can retrieve the entire table
+CREATE USER Falgun IDENTIFIED BY mypassword;
+GRANT SELECT ON student_grant TO Falgun;
+2. User Sumit can insert and delete the entire table.
+CREATE USER Sumit IDENTIFIED BY mypassword;
+GRANT INSERT, DELETE ON student_grant TO Sumit;
+
+3. Every user can retrieve his/her record only.
+GRANT select ON student_grant TO public;
+4. User Nalayak can retrieve the entire table and update on Course and RollNo only
+CREATE USER Nalayak IDENTIFIED BY mypassword;
+GRANT SELECT ON student_grant TO Nalayak;
+GRANT update (course,rollno) ON student_grant TO Nalayak;
+
+5. User Tasleem can retrieve over Name, StudentCode, and Result only.
+CREATE USER Tasleem IDENTIFIED BY mypassword;
+create view abc as select Name, StudentCode,Result from student_grant;
+
+grant select on abc to Tasleem;
+
+6. User Wheel can retrieve as T and update as N
+CREATE USER Wheel IDENTIFIED BY mypassword;
+GRANT SELECT(Name, StudentCode, Result), UPDATE(Course, RollNo) ON Student TO
+Wheel;
+
+7. User Pratap can all the privileges for BE-IT student records.
+CREATE USER Pratap IDENTIFIED BY mypassword;
+GRANT ALL PRIVILEGES TO Pratap;
+8. User Jalak can delete records for students of Batch B2
+CREATE USER Jalak IDENTIFIED BY mypassword;
+GRANT DELETE ON student_grant TO Jalak;
+9. GRANT ALL ON Student TO Jalak WHERE Course = &#39;BE-IT&#39;;
+10. User Babul can update and delete students record of courses where there are no
+more than 5 student
+CREATE USER Babul IDENTIFIED BY mypassword;
+
+SQL&gt; create or replace force view grant_b as select * from student where course in
+(select course from (select course,count(course) as freq from student group by
+course) where freq&lt;=5);
+SQL&gt; grant update,delete on grant_b to Babul;
+11. User Kanjus can retrieve for Eldest and youngest student
+CREATE USER Kanjus IDENTIFIED BY mypassword;
+SQL&gt; create or replace view grant_k as select * from student where dob=(select
+min(dob) from student) or dob=(select max(dob) from student);
+SQL&gt; grant select on grant_k to Kanjus;
+
+//10
+
+1. Equi Join
+List customer names along with their salesperson names (matching snum).
+SELECT c.cname, s.sname, s.city
+FROM customer c
+JOIN salespeople s
+ON c.snum = s.snum;
+Purpose: Equality join on snum in both tables.
+2. Self Join
+List pairs of salespeople who are in the same city but are not the same person.
+SELECT s1.sname AS Salesperson1, s2.sname AS Salesperson2, s1.city
+FROM salespeople s1
+JOIN salespeople s2
+ON s1.city = s2.city
+AND s1.snum &lt;&gt; s2.snum;
+Purpose: Same table compared with itself.
+3. Natural Join
+List order details along with customer information (joins automatically on same column
+names like cnum or snum).
+SELECT onum, amt, odate, cname, city
+FROM orders
+NATURAL JOIN customer;
+Purpose: Uses matching column names automatically.
+4. Theta Join
+List orders where the order amount is greater than 20,000, along with salesperson name.
+SELECT o.onum, o.amt, s.sname
+
+FROM orders o
+JOIN salespeople s
+ON o.snum = s.snum
+AND o.amt &gt; 20000;
+Purpose: Join condition includes a comparison (amt &gt; 20000) in addition to equality.
+1. UNION
+Get a list of all cities where either a salesperson or a customer is located (duplicates
+removed).
+SELECT city FROM salespeople
+UNION
+SELECT city FROM customer;
+2. INTERSECT
+Get a list of cities that are common to both salespeople and customers.
+SELECT city FROM salespeople
+INTERSECT
+SELECT city FROM customer;
+3. MINUS (EXCEPT)
+Get a list of cities where salespeople are located but no customer is located.
+SELECT city FROM salespeople
+MINUS
+SELECT city FROM customer;
