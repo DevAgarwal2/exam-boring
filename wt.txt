@@ -1,0 +1,369 @@
+//1 and 2
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Practical 1 & 2: HTML & Tables</title>
+    <style>
+        table, th, td { border: 2px solid black; border-collapse: collapse; padding: 10px; text-align: center; }
+        .complex-table { margin-top: 20px; width: 80%; }
+    </style>
+</head>
+<body>
+
+<h1>My Resume</h1>
+<img src="https://via.placeholder.com/100" alt="Profile Photo" style="float:right;">
+<p><strong>Name:</strong> John Doe<br><strong>Degree:</strong> MCA</p>
+
+<h3>Skills (List Types)</h3>
+<ul>
+    <li>HTML5 & CSS3</li>
+    <li>JavaScript</li>
+</ul>
+<ol type="I">
+    <li>Data Structures</li>
+    <li>Database Management</li>
+</ol>
+
+<h3>Special Characters</h3>
+<p>Copyright &copy; | Registered &reg; | Euro &euro; | Less than &lt; | Greater than &gt;</p>
+
+<hr>
+
+<h3>Inline Frames Demo</h3>
+<div style="display:flex; gap:20px;">
+    <iframe srcdoc="<a href='#ch1' target='content'>Chapter 1</a><br><a href='#ch2' target='content'>Chapter 2</a>" style="width:200px; height:150px;"></iframe>
+    <iframe name="content" srcdoc="<h2 id='ch1'>Chapter 1</h2><p>Details of Chap 1...</p><br><br><br><h2 id='ch2'>Chapter 2</h2><p>Details of Chap 2...</p>" style="width:300px; height:150px;"></iframe>
+</div>
+
+<hr>
+
+<h3>Practical 2: Complex Table Design</h3>
+<table class="complex-table">
+    <caption><strong>Table Example</strong></caption>
+    <tr>
+        <th colspan="2">Header-1</th>
+        <th rowspan="2">RIGHT CORNER OF TABLE</th>
+    </tr>
+    <tr>
+        <th>Header-2</th>
+        <th>Header-3</th>
+    </tr>
+    <tr>
+        <td>
+            1. Lists can be data<br>
+            2. Images can be data
+        </td>
+        <td rowspan="2">Two Tall<br>(Merged Vertically)</td>
+        <td>Two columns merged (Merged Horizontally?) <br> *Actually usually spans cols*</td>
+    </tr>
+    <tr>
+        <td><img src="https://via.placeholder.com/50" alt="Planet"></td>
+        <td>
+            <strong>Nested Table:</strong>
+            <table style="width:100%">
+                <tr><th>Header</th></tr>
+                <tr><td>Cell Data</td></tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">Table Footer</td>
+    </tr>
+</table>
+
+</body>
+</html>
+
+//3
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Practical 3: Registration Forms</title>
+</head>
+<body>
+
+<h2>Sample 1: Student Registration</h2>
+<form>
+    <fieldset>
+        <legend>Student Information</legend>
+        
+        <label>Roll Number: <input type="text" name="rollno"></label><br><br>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter your name here"><br><br>
+        
+        <label>Parent's Name: <input type="text"></label><br><br>
+        
+        <label>Your Image: <input type="file" accept="image/*"></label><br><br>
+        
+        Gender: 
+        <label><input type="radio" name="gender" value="male"> Male</label>
+        <label><input type="radio" name="gender" value="female"> Female</label><br><br>
+        
+        <label>Semester: 
+            <select>
+                <option>I</option><option>II</option><option>III</option>
+            </select>
+        </label><br><br>
+        
+        <label>Address:<br>
+            <textarea cols="30" rows="4" placeholder="Enter your present address"></textarea>
+        </label><br><br>
+        
+        <label>Age (Range): 
+            20 <input type="range" min="20" max="65" oninput="this.nextElementSibling.value = this.value">
+            <output>42</output>
+        </label>
+    </fieldset>
+</form>
+
+<hr>
+
+<h2>Sample 2: Customer Registration (No JS)</h2>
+<form>
+    <label>Customer ID: <input type="text" name="cust_id"></label><br><br>
+    
+    <label>Name (Max 60): <input type="text" maxlength="60"></label><br><br>
+    
+    <label>Age (18-80): <input type="number" min="18" max="80"></label><br><br>
+    
+    Gender:
+    <input type="radio" name="c_gender" value="male" checked> Male
+    <input type="radio" name="c_gender" value="female"> Female<br><br>
+    
+    <label>Account Type: <input list="accounts"></label>
+    <datalist id="accounts">
+        <option value="Basic">
+        <option value="Privileged">
+    </datalist><br><br>
+    
+    <label>Photo: <input type="file" accept="image/*"></label><br><br>
+    
+    <label>Email: <input type="email"></label><br><br>
+    
+    <label>Password: <input type="password"></label><br><br>
+    
+    <label>Confirm Password: <input type="password"></label><br><br>
+    
+    <label>Homepage URL: <input type="url"></label><br><br>
+    
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset">
+</form>
+
+</body>
+</html>
+
+//4 ,5,10
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS Practicals</title>
+    <style>
+        /* Practical 4: Borders */
+        .box-dotted { border: 5px dotted black; padding: 20px; width: 200px; margin-bottom: 10px; }
+        .box-dashed { border: 5px dashed black; padding: 20px; width: 200px; }
+
+        /* Practical 5: Animation (Square to Circle) */
+        .anim-shape {
+            width: 100px; height: 100px; background-color: blue; margin: 20px;
+            animation: shapeShifter 4s infinite;
+        }
+        @keyframes shapeShifter {
+            0% { border-radius: 0%; }    /* Square */
+            50% { border-radius: 50%; }  /* Circle */
+            100% { border-radius: 0%; }  /* Square */
+        }
+
+        /* Practical 5: Transition */
+        .trans-box {
+            width: 150px; height: 100px; background-color: grey; margin: 20px;
+            transition: all 0.5s ease;
+        }
+        .trans-box:hover {
+            box-shadow: 10px 10px 5px #888;
+            border-radius: 50%; /* Ellipse */
+            background-color: red;
+        }
+
+        /* Practical 10: Petal Design (Leaf shapes) */
+        .flower-container { display: flex; flex-wrap: wrap; width: 210px; }
+        .petal {
+            width: 100px; height: 100px; margin: 2px;
+        }
+        .p1 { background: lightblue; border-radius: 0 100% 0 100%; }
+        .p2 { background: red; border-radius: 100% 0 100% 0; }
+        .p3 { background: orange; border-radius: 100% 0 100% 0; }
+        .p4 { background: yellow; border-radius: 0 100% 0 100%; }
+
+        /* Media Query Print */
+        @media print {
+            body { background-color: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<h3>Prac 4: Borders</h3>
+<div class="box-dotted">Figure 1 (Dotted)</div>
+<div class="box-dashed">Figure 2 (Dashed)</div>
+
+<h3>Prac 5: Animation</h3>
+<div class="anim-shape"></div>
+
+<h3>Prac 5: Transition (Hover me)</h3>
+<div class="trans-box"></div>
+
+<h3>Prac 10: Div Designs (Petals)</h3>
+<div class="flower-container">
+    <div class="petal p1"></div>
+    <div class="petal p2"></div>
+    <div class="petal p3"></div>
+    <div class="petal p4"></div>
+</div>
+
+</body>
+</html>,
+// 6,7
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Practicals</title>
+    <style>
+        .grid-table td { width: 30px; height: 30px; border: 1px solid black; }
+    </style>
+</head>
+<body>
+
+<h3>JS Arithmetic & Logic</h3>
+<button onclick="doMath()">Run Arithmetic & Factorial</button>
+<div id="output"></div>
+
+<h3>Loop Table</h3>
+<div id="tableContainer"></div>
+
+<h3>Date Greeting</h3>
+<div id="greeting"></div>
+
+<h3>Form Validation</h3>
+<form onsubmit="return validateForm()">
+    IP Address: <input type="text" id="ip"><br>
+    Date (DD/MM/YYYY): <input type="text" id="date"><br>
+    Password: <input type="password" id="pass"><br>
+    Confirm: <input type="password" id="cpass"><br>
+    <button type="submit">Validate</button>
+</form>
+
+<script>
+    // Prac 6a: Arithmetic & Factorial
+    function doMath() {
+        let n = 5; 
+        let fact = 1;
+        for(let i=1; i<=n; i++) fact *= i;
+        
+        let msg = "5 is " + (5%2==0 ? "Even" : "Odd") + ". Factorial of 5 is " + fact;
+        document.getElementById('output').innerText = msg;
+    }
+
+    // Prac 6a: Nested Loop Table
+    let tableHTML = "<table class='grid-table' style='width:240px'>";
+    for(let r=0; r<8; r++) {
+        tableHTML += "<tr>";
+        for(let c=0; c<8; c++) {
+            tableHTML += "<td></td>";
+        }
+        tableHTML += "</tr>";
+    }
+    tableHTML += "</table>";
+    document.getElementById('tableContainer').innerHTML = tableHTML;
+
+    // Prac 6b: Date & Greeting
+    const now = new Date();
+    const hrs = now.getHours();
+    let greet = "Good Morning";
+    if(hrs >= 12) greet = "Good Afternoon";
+    if(hrs >= 17) greet = "Good Evening";
+    document.getElementById('greeting').innerText = `${greet}, ${now.toLocaleString()}`;
+
+    // Prac 6b: Validation
+    function validateForm() {
+        let ip = document.getElementById('ip').value;
+        let date = document.getElementById('date').value;
+        let p1 = document.getElementById('pass').value;
+        let p2 = document.getElementById('cpass').value;
+
+        // Simple Regex Examples
+        let ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+        let dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+
+        if (!ipRegex.test(ip)) { alert("Invalid IP"); return false; }
+        if (!dateRegex.test(date)) { alert("Invalid Date"); return false; }
+        if (p1 !== p2) { alert("Passwords do not match"); return false; }
+        
+        alert("Form Valid!");
+        return false; // Prevent actual submit for demo
+    }
+</script>
+
+</body>
+</html>,
+
+//8,9
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery Practicals</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .blink { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h3>Prac 8: Textareas & Paragraphs</h3>
+<textarea>Text area 1</textarea>
+<p>Paragraph 1</p>
+<button id="btnP8">Apply Borders (Prac 8)</button>
+
+<h3>Prac 9: Checkbox Enable & Blinking</h3>
+<label><input type="checkbox" id="agree"> I Agree</label>
+<button id="submitBtn" disabled>Submit</button>
+
+<h3 class="blink-text">This text will blink</h3>
+
+<h3 class="click-hide">Click me to hide me!</h3>
+<h3 class="click-hide">Me too!</h3>
+
+<script>
+    $(document).ready(function(){
+        // Prac 8: Find textareas -> Border, Add P -> Border Red
+        $("#btnP8").click(function(){
+            $("textarea").css("border", "2px solid blue");
+            $("p").add("textarea").css("border-color", "red"); // Adds P to selection
+        });
+
+        // Prac 9: Disable submit until checked
+        $("#agree").change(function(){
+            $("#submitBtn").prop("disabled", !this.checked);
+        });
+
+        // Prac 9: Blink Text
+        setInterval(function(){
+            $(".blink-text").fadeOut(500).fadeIn(500);
+        }, 1000);
+
+        // Prac 9: Hide headings on click
+        $(".click-hide").click(function(){
+            $(this).hide();
+        });
+    });
+</script>
+
+</body>
+</html>
