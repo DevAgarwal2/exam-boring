@@ -732,3 +732,186 @@ Get a list of cities where salespeople are located but no customer is located.
 SELECT city FROM salespeople
 MINUS
 SELECT city FROM customer;
+
+
+//q1 and q2
+Part 1: Table Creation (Problem Definition-1)
+Copy and paste this block to create your database schema.
+
+SQL
+
+-- Cleanup (Optional: removes old tables if they exist)
+DROP TABLE Enrollments;
+DROP TABLE Courses;
+DROP TABLE Faculty;
+DROP TABLE Students;
+DROP VIEW Student_Course_View;
+
+-- 1. Create Student Table
+CREATE TABLE Students (
+    student_id NUMBER PRIMARY KEY,
+    student_name VARCHAR2(100) NOT NULL,
+    email VARCHAR2(100) UNIQUE,
+    enrollment_date DATE DEFAULT SYSDATE
+);
+
+-- 2. Create Faculty Table
+CREATE TABLE Faculty (
+    faculty_id NUMBER PRIMARY KEY,
+    faculty_name VARCHAR2(100) NOT NULL,
+    department VARCHAR2(50)
+);
+
+-- 3. Create Course Table
+-- Includes a Foreign Key to Faculty (one faculty teaches a course)
+CREATE TABLE Courses (
+    course_id NUMBER PRIMARY KEY,
+    course_name VARCHAR2(100) NOT NULL,
+    credits NUMBER CHECK (credits > 0),
+    faculty_id NUMBER,
+    CONSTRAINT fk_faculty FOREIGN KEY (faculty_id) REFERENCES Faculty(faculty_id)
+);
+
+-- 4. Create Enrollment Table
+-- Links Students to Courses
+CREATE TABLE Enrollments (
+    enrollment_id NUMBER PRIMARY KEY,
+    student_id NUMBER,
+    course_id NUMBER,
+    CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+Part 2: Inserting Data
+Note: I have added enough data here to ensure Question #4 (more than 5 students) and Question #9 (Name starts with 'S') yield results.
+
+SQL
+
+-- Insert Faculty
+INSERT INTO Faculty VALUES (1, 'Dr. Alice Johnson', 'Computer Science');
+INSERT INTO Faculty VALUES (2, 'Prof. Bob Smith', 'Mathematics');
+INSERT INTO Faculty VALUES (3, 'Dr. Carol White', 'Physics'); 
+INSERT INTO Faculty VALUES (4, 'Prof. Lazy', 'History'); -- Not assigned to any course (For Q8)
+
+-- Insert Courses
+INSERT INTO Courses VALUES (101, 'Database Systems', 4, 1);
+INSERT INTO Courses VALUES (102, 'Calculus I', 3, 2);
+INSERT INTO Courses VALUES (103, 'Physics 101', 4, 3);
+INSERT INTO Courses VALUES (104, 'Advanced AI', 4, 1); -- Course with no students (For Q7)
+
+-- Insert Students (Including names starting with 'S' for Q9)
+INSERT INTO Students VALUES (1, 'John Doe', 'john@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (2, 'Sam Wilson', 'sam@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (3, 'Sarah Connor', 'sarah@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (4, 'Mike Ross', 'mike@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (5, 'Steve Rogers', 'steve@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (6, 'Tony Stark', 'tony@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (7, 'Bruce Wayne', 'bruce@uni.edu', SYSDATE);
+INSERT INTO Students VALUES (8, 'Peter Parker', 'peter@uni.edu', SYSDATE); -- Not enrolled (For Q10)
+
+-- Insert Enrollments
+-- Enrolling 6 students into Course 101 (Database Systems) for Q4
+INSERT INTO Enrollments VALUES (1, 1, 101);
+INSERT INTO Enrollments VALUES (2, 2, 101);
+INSERT INTO Enrollments VALUES (3, 3, 101);
+INSERT INTO Enrollments VALUES (4, 4, 101);
+INSERT INTO Enrollments VALUES (5, 5, 101);
+INSERT INTO Enrollments VALUES (6, 6, 101);
+
+-- Enrolling students in other courses
+INSERT INTO Enrollments VALUES (7, 1, 102); -- John Doe in a second course (For Q6)
+INSERT INTO Enrollments VALUES (8, 2, 103);
+
+COMMIT;
+Part 3: The 10 Queries (Problem Definition-2)
+Here are the specific SQL commands for the numbered questions in your image.
+
+1. Display student names along with the courses they are enrolled in (INNER JOIN).
+
+SQL
+
+SELECT s.student_name, c.course_name 
+FROM Students s
+INNER JOIN Enrollments e ON s.student_id = e.student_id
+INNER JOIN Courses c ON e.course_id = c.course_id;
+2. Display course names and the faculty members teaching them (INNER JOIN).
+
+SQL
+
+SELECT c.course_name, f.faculty_name 
+FROM Courses c
+INNER JOIN Faculty f ON c.faculty_id = f.faculty_id;
+3. Find the total number of students enrolled in each course (GROUP BY).
+
+SQL
+
+SELECT c.course_name, COUNT(e.student_id) AS total_students
+FROM Courses c
+JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_name;
+4. List only those courses with more than 5 students enrolled (GROUP BY and HAVING).
+
+SQL
+
+SELECT c.course_name, COUNT(e.student_id) AS total_students
+FROM Courses c
+JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_name
+HAVING COUNT(e.student_id) > 5;
+5. Create a VIEW that displays student names, course names, and faculty names.
+
+SQL
+
+CREATE VIEW Student_Course_View AS
+SELECT s.student_name, c.course_name, f.faculty_name
+FROM Students s
+JOIN Enrollments e ON s.student_id = e.student_id
+JOIN Courses c ON e.course_id = c.course_id
+JOIN Faculty f ON c.faculty_id = f.faculty_id;
+
+-- To test the view:
+-- SELECT * FROM Student_Course_View;
+6. Display students who are enrolled in more than one course (Subquery).
+
+SQL
+
+SELECT student_name 
+FROM Students 
+WHERE student_id IN (
+    SELECT student_id 
+    FROM Enrollments 
+    GROUP BY student_id 
+    HAVING COUNT(course_id) > 1
+);
+7. Find the courses that have no student enrollments (Subquery).
+
+SQL
+
+SELECT course_name 
+FROM Courses 
+WHERE course_id NOT IN (
+    SELECT DISTINCT course_id FROM Enrollments
+);
+8. Display faculty members who are not assigned to any course (WHERE and NULL check). Logic: We use a Left Join. If a match is not found in the courses table, the course_id will be NULL.
+
+SQL
+
+SELECT f.faculty_name 
+FROM Faculty f
+LEFT JOIN Courses c ON f.faculty_id = c.faculty_id
+WHERE c.course_id IS NULL;
+9. List students whose names start with the letter 'S' (LIKE operator).
+
+SQL
+
+SELECT student_name 
+FROM Students 
+WHERE student_name LIKE 'S%';
+10. Display students who are not enrolled in any course (NOT operator).
+
+SQL
+
+SELECT student_name 
+FROM Students 
+WHERE student_id NOT IN (
+    SELECT student_id FROM Enrollments
+);
