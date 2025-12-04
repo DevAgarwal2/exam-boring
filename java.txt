@@ -1,0 +1,142 @@
+//1
+class Main1 {
+    String bankName;
+    String branch;
+    int branchCode;
+
+    public Main1(String bankName, String branch, int branchCode) {
+        this.bankName = bankName;
+        this.branch = branch;
+        this.branchCode = branchCode;
+    }
+
+    public void createAccount(String accountHolder, int accountNumber, double balance) {
+        System.out.println("Bank Account created");
+        System.out.println("Account_Holder_Name: " + accountHolder);
+        System.out.println("Account_Number: " + accountNumber);
+        System.out.println("Opening_Balance: " + balance);
+        System.out.println("Bank_Details: " + bankName +  branch );
+    }
+
+    public static void main(String[] args) {
+        Main1 b1 = new Main1("ICICI Bank", "Branch1", 101);
+        
+        b1.createAccount("Person1", 1, 1000);
+        Main1 b2 = new Main1("HDFC Bank", "Branch2", 201);
+        b2.createAccount("user2", 2, 1000);
+    }
+}
+
+
+//7
+public class main7_1 {
+    public static void main(String[] args) {
+        Shape s1 = new Rectangle(4, 5);
+        Shape s2 = new Circle(3);
+        Shape s3 = new Triangle(4, 6);
+        System.out.println("Rectangle Area: " + s1.getArea());
+        System.out.println("Circle Area: " + s2.getArea());
+        System.out.println("Triangle Area: " + s3.getArea());
+    }
+}
+interface Shape {
+    double getArea();
+}
+
+class Rectangle implements Shape {
+    double length, width;
+    Rectangle(double l, double w) {
+        length = l;
+        width = w;
+    }
+    public double getArea() {
+        return length * width;
+    }
+}
+
+class Circle implements Shape {
+    double radius;
+    Circle(double r) {
+        radius = r;
+    }
+    public double getArea() {
+        return Math.PI * radius * radius;
+    }
+}
+
+class Triangle implements Shape {
+    double base, height;
+    Triangle(double b, double h) {
+        base = b;
+        height = h;
+    }
+    public double getArea() {
+        return 0.5 * base * height;
+    }
+}
+
+
+
+
+
+
+//9
+class Counter {
+    static int count = 0;
+    synchronized static void increment() {
+        count++;
+    }
+}
+
+class MyThread extends Thread {
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            Counter.increment();
+        }
+    }
+}
+
+public class main9_1 {
+    public static void main(String[] args) throws InterruptedException {
+        MyThread t1 = new MyThread();
+        MyThread t2 = new MyThread();
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println("Final counter value: " + Counter.count);
+    }
+}
+//10
+
+import java.io.*;
+
+
+public class main10 {
+    public static void main(String[] args) {
+        try (FileInputStream fis = new FileInputStream("source.bin");
+             FileOutputStream fos = new FileOutputStream("copy.bin")) {
+
+            int b;
+            while ((b = fis.read()) != -1) {
+                fos.write(b);
+            }
+            System.out.println("File copied successfully!");
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+    
+}
+//12
+import student.Student;
+import staff.Staff;
+
+public class main12 {
+    public static void main(String[] args) {
+        Student s = new Student();
+        Staff st = new Staff();
+        s.showStudent();
+        st.showStaff();
+    }
+}
