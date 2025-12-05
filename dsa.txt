@@ -1,0 +1,949 @@
+//1
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Node structure
+struct Course {
+    char name[100];
+    struct Course* next;
+};
+
+// Head pointer for course list
+struct Course* head = NULL;
+
+// Function to add a course
+void addCourse(char courseName[]) {
+    struct Course* newCourse = (struct Course*)malloc(sizeof(struct Course));
+    strcpy(newCourse->name, courseName);
+    newCourse->next = NULL;
+
+    if (head == NULL) {
+        head = newCourse;
+    } else {
+        struct Course* temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newCourse;
+    }
+    printf("Course '%s' added successfully.\n", courseName);
+}
+
+// Function to remove a course
+void removeCourse(char courseName[]) {
+    struct Course* temp = head;
+    struct Course* prev = NULL;
+
+    while (temp != NULL && strcmp(temp->name, courseName) != 0) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Course '%s' not found.\n", courseName);
+        return;
+    }
+
+    if (prev == NULL) {
+        head = temp->next; // removing head
+    } else {
+        prev->next = temp->next;
+    }
+
+    free(temp);
+    printf("Course '%s' removed successfully.\n", courseName);
+}
+
+// Function to list all courses
+void listCourses() {
+    if (head == NULL) {
+        printf("No courses available.\n");
+        return;
+    }
+
+    struct Course* temp = head;
+    printf("Available Courses:\n");
+    while (temp != NULL) {
+        printf(" - %s\n", temp->name);
+        temp = temp->next;
+    }
+}
+
+// Main function (demo)
+int main() {
+    addCourse("Mathematics");
+    addCourse("Physics");
+    addCourse("Computer Science");
+
+    listCourses();
+
+    removeCourse("Physics");
+    listCourses();
+
+    addCourse("Chemistry");
+    listCourses();
+
+    return 0;
+}
+
+
+//2
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+// Stack structure
+struct Stack {
+    int top;
+    char items[MAX];
+};
+
+// Initialize stack
+void initStack(struct Stack* s) {
+    s->top = -1;
+}
+
+// Check if stack is empty
+int isEmpty(struct Stack* s) {
+    return s->top == -1;
+}
+
+// Check if stack is full
+int isFull(struct Stack* s) {
+    return s->top == MAX - 1;
+}
+
+// Push element onto stack
+void push(struct Stack* s, char c) {
+    if (!isFull(s)) {
+        s->items[++(s->top)] = c;
+    }
+}
+
+// Pop element from stack
+char pop(struct Stack* s) {
+    if (!isEmpty(s)) {
+        return s->items[(s->top)--];
+    }
+    return '\0'; // return null if stack empty
+}
+
+// Function to check balanced parentheses
+int isBalanced(char expr[]) {
+    struct Stack s;
+    initStack(&s);
+
+    for (int i = 0; i < strlen(expr); i++) {
+        if (expr[i] == '(') {
+            push(&s, '(');
+        } else if (expr[i] == ')') {
+            if (isEmpty(&s)) {
+                return 0; // closing without matching opening
+            }
+            pop(&s);
+        }
+    }
+
+    return isEmpty(&s); // stack should be empty if balanced
+}
+
+// Main function
+int main() {
+    char expr[MAX];
+
+    printf("Enter an algebraic expression: ");
+    scanf("%s", expr);
+
+    if (isBalanced(expr)) {
+        printf("The expression is Balanced.\n");
+    } else {
+        printf("The expression is NOT Balanced.\n");
+    }
+
+    return 0;
+}
+//3
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+
+#define MAX 100
+
+// Stack structure for characters (for infix to postfix)
+typedef struct {
+    char data[MAX];
+    int top;
+} Stack;
+
+// Initialize stack
+void initStack(Stack *s) {
+    s->top = -1;
+}
+
+// Check if stack is empty
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+// Push operation
+void push(Stack *s, char item) {
+    if (s->top >= MAX - 1) {
+        printf("Stack overflow!\n");
+        exit(1);
+    }
+    s->data[++(s->top)] = item;
+}
+
+// Pop operation
+char pop(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack underflow!\n");
+        exit(1);
+    }
+    return s->data[(s->top)--];
+}
+
+// Peek top element
+char peek(Stack *s) {
+    if (isEmpty(s)) return '\0';
+    return s->data[s->top];
+}
+
+// Check if character is an operator
+int isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^');
+}
+
+// Return precedence of operator
+int precedence(char op) {
+    switch (op) {
+        case '+':
+        case '-': return 1;
+        case '*':
+        case '/': return 2;
+        case '^': return 3;
+        default: return 0;
+    }
+}
+
+// Convert infix to postfix
+void infixToPostfix(char *infix, char *postfix) {
+    Stack s;
+    initStack(&s);
+
+    int i, j = 0;
+    char c;
+
+    for (i = 0; infix[i] != '\0'; i++) {
+        c = infix[i];
+
+        // If operand (digit), add to postfix
+        if (isdigit(c)) {
+            postfix[j++] = c;
+        }
+        // If opening parenthesis, push to stack
+        else if (c == '(') {
+            push(&s, c);
+        }
+        // If closing parenthesis, pop until '('
+        else if (c == ')') {
+            while (!isEmpty(&s) && peek(&s) != '(') {
+                postfix[j++] = pop(&s);
+            }
+            pop(&s); // Remove '('
+        }
+        // If operator
+        else if (isOperator(c)) {
+            while (!isEmpty(&s) && peek(&s) != '(' &&
+                   precedence(peek(&s)) >= precedence(c)) {
+                postfix[j++] = pop(&s);
+            }
+            push(&s, c);
+        }
+        // Ignore spaces (optional)
+        else if (c == ' ') {
+            continue;
+        }
+        else {
+            printf("Invalid character: %c\n", c);
+            exit(1);
+        }
+    }
+
+    // Pop remaining operators
+    while (!isEmpty(&s)) {
+        postfix[j++] = pop(&s);
+    }
+    postfix[j] = '\0'; // Null terminate
+}
+
+// Stack for evaluation (float values)
+typedef struct {
+    float data[MAX];
+    int top;
+} FloatStack;
+
+void initFloatStack(FloatStack *s) {
+    s->top = -1;
+}
+
+int isEmptyFloat(FloatStack *s) {
+    return s->top == -1;
+}
+
+void pushFloat(FloatStack *s, float item) {
+    if (s->top >= MAX - 1) {
+        printf("Float stack overflow!\n");
+        exit(1);
+    }
+    s->data[++(s->top)] = item;
+}
+
+float popFloat(FloatStack *s) {
+    if (isEmptyFloat(s)) {
+        printf("Float stack underflow!\n");
+        exit(1);
+    }
+    return s->data[(s->top)--];
+}
+
+// Evaluate postfix expression
+float evaluatePostfix(char *postfix) {
+    FloatStack s;
+    initFloatStack(&s);
+
+    int i;
+    char c;
+    float op1, op2, result;
+
+    for (i = 0; postfix[i] != '\0'; i++) {
+        c = postfix[i];
+
+        if (isdigit(c)) {
+            pushFloat(&s, (float)(c - '0'));
+        }
+        else if (isOperator(c)) {
+            if (isEmptyFloat(&s)) {
+                printf("Invalid postfix expression!\n");
+                exit(1);
+            }
+            op2 = popFloat(&s);
+            op1 = popFloat(&s);
+
+            switch (c) {
+                case '+': result = op1 + op2; break;
+                case '-': result = op1 - op2; break;
+                case '*': result = op1 * op2; break;
+                case '/':
+                    if (op2 == 0) {
+                        printf("Error: Division by zero!\n");
+                        exit(1);
+                    }
+                    result = op1 / op2;
+                    break;
+                case '^': result = pow(op1, op2); break;
+                default: result = 0;
+            }
+            pushFloat(&s, result);
+        }
+    }
+
+    if (s.top != 0) {
+        printf("Invalid postfix expression!\n");
+        exit(1);
+    }
+
+    return popFloat(&s);
+}
+
+// Main function
+int main() {
+    char infix[MAX], postfix[MAX];
+
+    printf("Enter an infix expression (use single digits): ");
+    fgets(infix, sizeof(infix), stdin);
+
+    // Remove newline if present
+    int len = strlen(infix);
+    if (len > 0 && infix[len - 1] == '\n') {
+        infix[len - 1] = '\0';
+    }
+
+    // Convert to postfix
+    infixToPostfix(infix, postfix);
+
+    printf("Postfix expression: %s\n", postfix);
+
+    // Evaluate postfix
+    float result = evaluatePostfix(postfix);
+    printf("Result: %.2f\n", result);
+
+    return 0;
+}
+//4
+
+// deque_static.c
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int left, right; // left = index of leftmost element, right = index of rightmost element
+    int count;
+} Deque;
+
+void init(Deque *d) { d->left = 0; d->right = -1; d->count = 0; }
+
+int is_full(Deque *d){ return d->count == MAX; }
+int is_empty(Deque *d){ return d->count == 0; }
+
+void insert_left(Deque *d, int x){
+    if(is_full(d)){ printf("Deque full\n"); return; }
+    d->left = (d->left - 1 + MAX) % MAX;
+    d->arr[d->left] = x;
+    if(d->count == 0) d->right = d->left;
+    d->count++;
+}
+
+void insert_right(Deque *d, int x){
+    if(is_full(d)){ printf("Deque full\n"); return; }
+    d->right = (d->right + 1) % MAX;
+    d->arr[d->right] = x;
+    if(d->count == 0) d->left = d->right;
+    d->count++;
+}
+
+void delete_left(Deque *d){
+    if(is_empty(d)){ printf("Deque empty\n"); return; }
+    printf("Deleted from left: %d\n", d->arr[d->left]);
+    d->left = (d->left + 1) % MAX;
+    d->count--;
+    if(d->count==0){ d->left=0; d->right=-1; }
+}
+
+void delete_right(Deque *d){
+    if(is_empty(d)){ printf("Deque empty\n"); return; }
+    printf("Deleted from right: %d\n", d->arr[d->right]);
+    d->right = (d->right - 1 + MAX) % MAX;
+    d->count--;
+    if(d->count==0){ d->left=0; d->right=-1; }
+}
+
+void display(Deque *d){
+    if(is_empty(d)){ printf("Deque empty\n"); return; }
+    int i = d->left;
+    printf("Deque: ");
+    for(int c=0;c<d->count;c++){
+        printf("%d ", d->arr[i]);
+        i = (i+1)%MAX;
+    }
+    printf("\n");
+}
+
+int main(){
+    Deque d;
+    init(&d);
+    insert_right(&d, 10);
+    insert_left(&d, 5);
+    insert_right(&d, 20);
+    display(&d);
+    delete_left(&d);
+    delete_right(&d);
+    display(&d);
+    return 0;
+}
+
+
+//5
+// heap_sim.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Block {
+    int id;
+    size_t size;
+    struct Block *next;
+} Block;
+
+Block *free_list = NULL;
+Block *used_list = NULL;
+int next_id = 1;
+
+void add_free_block(size_t size){
+    Block *b = malloc(sizeof(Block));
+    b->id = 0; b->size = size; b->next = free_list;
+    free_list = b;
+}
+
+void display_list(Block *head, const char *name){
+    printf("%s:\n", name);
+    if(!head){ printf("  <empty>\n"); return; }
+    Block *p = head;
+    while(p){
+        printf("  id=%d size=%zu\n", p->id, p->size);
+        p = p->next;
+    }
+}
+
+void allocate_block(size_t size){
+    Block **pp = &free_list;
+    while(*pp && (*pp)->size < size) pp = &(*pp)->next;
+    if(!*pp){
+        printf("No suitable free block found for size %zu\n", size);
+        return;
+    }
+    Block *chosen = *pp;
+    *pp = chosen->next; // remove from free list
+    chosen->id = next_id++;
+    // Optional: split block (simple version: no split)
+    chosen->next = used_list;
+    used_list = chosen;
+    printf("Allocated id=%d size=%zu\n", chosen->id, chosen->size);
+}
+
+void deallocate_by_id(int id){
+    Block **pp = &used_list;
+    while(*pp && (*pp)->id != id) pp = &(*pp)->next;
+    if(!*pp){ printf("No used block with id %d\n", id); return; }
+    Block *b = *pp;
+    *pp = b->next;
+    b->id = 0;
+    b->next = free_list;
+    free_list = b;
+    printf("Deallocated block (returned to free list)\n");
+}
+
+int main(){
+    // initialize some free blocks
+    add_free_block(1024);
+    add_free_block(2048);
+    add_free_block(512);
+    display_list(free_list, "Free list");
+    allocate_block(500);
+    allocate_block(1500);
+    display_list(used_list, "Used list");
+    display_list(free_list, "Free list");
+    deallocate_by_id(1);
+    display_list(used_list, "Used list");
+    display_list(free_list, "Free list");
+    // cleanup
+    return 0;
+}
+//6
+
+// playlist.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Song {
+    char name[128];
+    struct Song *prev, *next;
+} Song;
+
+Song *head = NULL;
+Song *tail = NULL;
+Song *current = NULL;
+
+Song* make_song(const char *name){
+    Song *s = malloc(sizeof(Song));
+    strncpy(s->name, name, 127); s->name[127]=0;
+    s->prev = s->next = NULL;
+    return s;
+}
+
+void add_song(const char *name){
+    Song *s = make_song(name);
+    if(!head){ head = tail = s; }
+    else { tail->next = s; s->prev = tail; tail = s; }
+    if(!current) current = head;
+}
+
+void play_next(){
+    if(!current) { printf("Playlist empty\n"); return; }
+    if(current->next) current = current->next;
+    printf("Playing: %s\n", current->name);
+}
+
+void play_prev(){
+    if(!current) { printf("Playlist empty\n"); return; }
+    if(current->prev) current = current->prev;
+    printf("Playing: %s\n", current->name);
+}
+
+void play_first(){ if(!head) printf("Empty\n"); else { current = head; printf("Playing: %s\n", current->name);} }
+void play_last(){ if(!tail) printf("Empty\n"); else { current = tail; printf("Playing: %s\n", current->name);} }
+
+void play_specific(int idx){ // 0-based
+    Song *p = head; int i=0;
+    while(p && i<idx){ p=p->next; i++; }
+    if(!p) { printf("Index out of range\n"); return; }
+    current = p; printf("Playing: %s\n", current->name);
+}
+
+void list_all(){
+    Song *p = head; int i=0;
+    while(p){
+        printf("%d: %s%s\n", i++, p->name, (p==current?" <-- current":""));
+        p = p->next;
+    }
+}
+
+int main(){
+    add_song("Song A");
+    add_song("Song B");
+    add_song("Song C");
+    play_first();
+    play_next();
+    play_prev();
+    play_last();
+    play_specific(1);
+    list_all();
+    return 0;
+}
+
+
+//7
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+
+typedef struct {
+    Node *rear; // rear->next is front; rear == NULL when empty
+} CQueue;
+
+void init(CQueue *q){ q->rear = NULL; }
+
+int is_empty(CQueue *q){ return q->rear == NULL; }
+
+void enqueue(CQueue *q, int x){
+    Node *n = malloc(sizeof(Node)); n->data = x;
+    if(is_empty(q)){ n->next = n; q->rear = n; }
+    else { n->next = q->rear->next; q->rear->next = n; q->rear = n; }
+}
+
+int dequeue(CQueue *q, int *out){
+    if(is_empty(q)) return 0;
+    Node *front = q->rear->next;
+    *out = front->data;
+    if(front == q->rear){ free(front); q->rear = NULL; }
+    else { q->rear->next = front->next; free(front); }
+    return 1;
+}
+
+void display(CQueue *q){
+    if(is_empty(q)){ printf("Empty\n"); return; }
+    Node *p = q->rear->next;
+    do {
+        printf("%d ", p->data);
+        p = p->next;
+    } while(p != q->rear->next);
+    printf("\n");
+}
+
+int main(){
+    CQueue q; init(&q);
+    enqueue(&q, 10); enqueue(&q, 20); enqueue(&q, 30);
+    display(&q);
+    int val;
+    dequeue(&q, &val); printf("Dequeued: %d\n", val);
+    display(&q);
+    return 0;
+}
+//7
+// bst_dictionary.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    char word[128];
+    char def[512];
+    struct Node *left, *right;
+} Node;
+
+Node* make_node(const char *w, const char *d){
+    Node *n = malloc(sizeof(Node));
+    strncpy(n->word, w, 127); n->word[127]=0;
+    strncpy(n->def, d, 511); n->def[511]=0;
+    n->left = n->right = NULL;
+    return n;
+}
+
+Node* insert(Node *root, const char *w, const char *d){
+    if(!root) return make_node(w,d);
+    int cmp = strcmp(w, root->word);
+    if(cmp < 0) root->left = insert(root->left, w, d);
+    else if(cmp > 0) root->right = insert(root->right, w, d);
+    else strncpy(root->def, d, 511);
+    return root;
+}
+
+Node* find_min(Node *root){ while(root && root->left) root = root->left; return root; }
+
+Node* delete(Node *root, const char *w){
+    if(!root) return NULL;
+    int cmp = strcmp(w, root->word);
+    if(cmp < 0) root->left = delete(root->left, w);
+    else if(cmp > 0) root->right = delete(root->right, w);
+    else {
+        // found
+        if(!root->left){
+            Node *r = root->right; free(root); return r;
+        } else if(!root->right){
+            Node *l = root->left; free(root); return l;
+        } else {
+            Node *m = find_min(root->right);
+            strcpy(root->word, m->word);
+            strcpy(root->def, m->def);
+            root->right = delete(root->right, m->word);
+        }
+    }
+    return root;
+}
+
+Node* search(Node *root, const char *w){
+    if(!root) return NULL;
+    int cmp = strcmp(w, root->word);
+    if(cmp==0) return root;
+    if(cmp<0) return search(root->left, w);
+    return search(root->right, w);
+}
+
+void inorder(Node *root){
+    if(!root) return;
+    inorder(root->left);
+    printf("%s: %s\n", root->word, root->def);
+    inorder(root->right);
+}
+
+void reverse_inorder(Node *root){
+    if(!root) return;
+    reverse_inorder(root->right);
+    printf("%s: %s\n", root->word, root->def);
+    reverse_inorder(root->left);
+}
+
+int main(){
+    Node *root = NULL;
+    root = insert(root, "apple", "a fruit");
+    root = insert(root, "banana", "yellow fruit");
+    root = insert(root, "cat", "a small animal");
+    printf("Search 'banana':\n");
+    Node *s = search(root, "banana");
+    if(s) printf("Found: %s -> %s\n", s->word, s->def);
+    printf("\nAscending:\n"); inorder(root);
+    printf("\nDescending:\n"); reverse_inorder(root);
+    root = delete(root, "banana");
+    printf("\nAfter deleting banana:\n"); inorder(root);
+    return 0;
+}
+
+
+//8
+// adjacency_matrix.c
+#include <stdio.h>
+
+int main(){
+    // Devices A,B,C,D,E -> indices 0..4
+    const int N = 5;
+    int adj[N][N] = {0};
+    // connections (undirected)
+    // A-B, A-C
+    adj[0][1]=adj[1][0]=1;
+    adj[0][2]=adj[2][0]=1;
+    // B-C, B-D
+    adj[1][2]=adj[2][1]=1;
+    adj[1][3]=adj[3][1]=1;
+    // C-D
+    adj[2][3]=adj[3][2]=1;
+    // D-E
+    adj[3][4]=adj[4][3]=1;
+    // E-A
+    adj[4][0]=adj[0][4]=1;
+
+    printf("Graph is undirected.\nAdjacency matrix (A B C D E):\n");
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++) printf("%d ", adj[i][j]);
+        printf("\n");
+    }
+    return 0;
+}
+
+//9
+
+// binary_search_desc.c
+#include <stdio.h>
+
+int binary_search_desc(int arr[], int n, int key){
+    int l=0, r=n-1;
+    while(l<=r){
+        int mid = l + (r-l)/2;
+        if(arr[mid]==key) return mid;
+        if(arr[mid] < key) r = mid-1; // because desc sorted
+        else l = mid+1;
+    }
+    return -1;
+}
+
+int main(){
+    int arr[] = {100, 80, 50, 30, 10};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    int x = 30;
+    int idx = binary_search_desc(arr, n, x);
+    if(idx>=0) printf("Found at index %d\n", idx);
+    else printf("Not found\n");
+    return 0;
+}
+//10
+
+#include <stdio.h>
+
+// Time Complexity: O(n^2)
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Time Complexity: O(n^2)
+void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        // Find minimum in unsorted part
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        // Swap found minimum with first element
+        int temp = arr[min_idx];
+        arr[min_idx] = arr[i];
+        arr[i] = temp;
+    }
+}
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int main() {
+    int arr1[] = {64, 34, 25, 12, 22};
+    int n = 5;
+
+    printf("Original: "); printArray(arr1, n);
+
+    // Uncomment one to test
+    bubbleSort(arr1, n); 
+    // selectionSort(arr1, n);
+
+    printf("Sorted:   "); printArray(arr1, n);
+    return 0;
+}
+
+//last
+
+#include <stdio.h>
+
+// --- MERGE SORT FUNCTIONS ---
+
+void merge(int arr[], int l, int m, int r) {
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int L[n1], R[n2]; // Temp arrays
+
+    // Copy data
+    for (i = 0; i < n1; i++) L[i] = arr[l + i];
+    for (j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+
+    // Merge back
+    i = 0; j = 0; k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) arr[k++] = L[i++];
+        else              arr[k++] = R[j++];
+    }
+    while (i < n1) arr[k++] = L[i++];
+    while (j < n2) arr[k++] = R[j++];
+}
+
+void mergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}
+
+// --- HEAP SORT FUNCTIONS ---
+
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    if (largest != i) {
+        // Swap
+        int temp = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = temp;
+        heapify(arr, n, largest);
+    }
+}
+
+void heapSort(int arr[], int n) {
+    // Build max heap
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    // Extract elements one by one
+    for (int i = n - 1; i > 0; i--) {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heapify(arr, i, 0);
+    }
+}
+
+int main() {
+    int arr[] = {12, 11, 13, 5, 6, 7};
+    int n = 6;
+
+    // Uncomment one to test
+    // mergeSort(arr, 0, n - 1);
+    heapSort(arr, n);
+
+    printf("Sorted array: ");
+    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
+    
+    return 0;
+}
